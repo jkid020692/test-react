@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Dashboard from './dashboard';
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 class Login extends React.Component {
     constructor(props) {
@@ -56,6 +57,7 @@ class Login extends React.Component {
                         onChange={this.changePassWord.bind(this)}
                     />
                 </div>
+               
                 <button onClick={this.login.bind(this)}>Đăng nhập</button>
             </div>
         );

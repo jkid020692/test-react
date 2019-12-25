@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Link, Redirect } from "react-router-dom";
 
 var newsList = [
   {
@@ -56,28 +56,54 @@ var newsList = [
 ]
 
 class TableCategoryItem extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      redirect: false,
+      id: ""
+    };
+  }
   choseCategory(id) {
-    let a = <CategoryDetail id={id} />
-    ReactDOM.render(<CategoryDetail id={id} />, document.getElementById("category-detail"));
+    this.setState({
+      redirect: true,
+      id: id
+    })
+  }
+  renderRedirectDetail = () => {
+    // if (this.state.redirect){
+    //   return(
+    //     <BrowserRouter>
+    //     <Redirect to={{ pathname: '/category/' + this.state.id }} />
+    //     <Route path="/category/:id" component={CategoryDetail}/>
+    //   </BrowserRouter>
+    //   )
+    // }
+    return(
+      <BrowserRouter>
+      <Redirect to={{ pathname: '/category/' + this.state.id }} />
+      <Route path="/category/:id" component={CategoryDetail}/>
+    </BrowserRouter>
+    )
   }
   render() {
-    return (
+    debugger
+    const redirect = this.state.redirect;
+    return (      
       <BrowserRouter>
-        <tr>
-        <td>{this.props.stt}</td>
-        <td>
-        <Link
-            to={{ pathname: '/category/' + this.props.data.id }}
-            className="list-group-item"
-            key={this.props.data.id}>
-            {this.props.data.title}
-          </Link>
-
-          <Route exact path="/category/" component={CategoryDetail} />
-        </td>
-          
+      {redirect ? this.renderRedirectDetail() : (
+        <tr onClick={this.choseCategory.bind(this, this.props.data.id)}>
+          <td>{this.props.stt}</td>
+          <td>
+            <Link
+              to={{ pathname: '/category/' + this.props.data.id }}
+              className="list-group-item"
+              key={this.props.data.id}>
+              {this.props.data.title}
+            </Link>
+          </td>
         </tr>
-
+      )}
       </BrowserRouter>
     )
   }
@@ -107,6 +133,15 @@ class CategoryDetail extends React.Component {
     )
   }
 }
+class CategoryCreate extends React.Component {
+  render() {
+    return (
+      <div>
+       tạo
+      </div>
+    )
+  }
+}
 class TableList extends React.Component {
   constructor() {
     super();
@@ -127,8 +162,8 @@ class TableList extends React.Component {
       newsPerPage: event.target.value
     })
   }
-  viewCreateCategory(){
-    
+  viewCreateCategory() {
+
   }
   render() {
     let currentPage = this.state.currentPage;
@@ -147,7 +182,8 @@ class TableList extends React.Component {
     return (
       <div>
         <div>
-        <button onClick={this.viewCreateCategory.bind(this)} style={{cursor:"pointer"}}>Tạo mới category</button>
+
+          <button onClick={this.viewCreateCategory.bind(this)} style={{ cursor: "pointer" }}>Tạo mới category</button>
         </div>
         <table className="table">
           <thead>
