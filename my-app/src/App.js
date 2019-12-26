@@ -1,6 +1,6 @@
 import React from "react";
 import Login from './login';
-import CategoryList from './category';
+import CategoryList, {CategoryDetailRoute} from './category';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
 
 import './App.css';
@@ -25,28 +25,26 @@ class App extends React.Component {
   }
   render() {
     const isLoggedIn = this.state.isLoggedIn;
-    if (!isLoggedIn) {
-      return (
-        <Router>
-          <Switch>
-            <Route path="/login">
-              <Login callback={this.callbackFunction} />
-            </Route>
-          </Switch>
-        </Router>
-
-      );
-    }
-    else {
-      return (
-        <Router>
-        <Redirect push to="/category" />
-        <Route path="/category" component={CategoryList}/>
+    return (
+      <Router>
+          {
+            isLoggedIn ?
+              <>
+              <Redirect push to="/category" />
+              <Route exact path="/category">
+                <CategoryList />
+              </Route>
+              <Route path="/category/:id" render={(routerProps => <CategoryDetailRoute /> )} />
+                {/* <Redirect push to="/category" />
+                <Route path="/category" exact component={CategoryList} /> */}
+              </>
+              :
+              <Route path="/login">
+                <Login callback={this.callbackFunction} />
+              </Route>
+          }
       </Router>
-      );
-    }
-
+    )
   }
-
 }
 export default App;

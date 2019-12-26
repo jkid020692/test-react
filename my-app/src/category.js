@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import ReactDOM from 'react-dom';
+import { withRouter } from "react-router-dom";
 import { BrowserRouter, Switch, Route, Link, Redirect } from "react-router-dom";
 
 var newsList = [
@@ -65,53 +66,34 @@ class TableCategoryItem extends React.Component {
     };
   }
   choseCategory(id) {
-    this.setState({
-      redirect: true,
-      id: id
-    })
-  }
-  renderRedirectDetail = () => {
-    // if (this.state.redirect){
-    //   return(
-    //     <BrowserRouter>
-    //     <Redirect to={{ pathname: '/category/' + this.state.id }} />
-    //     <Route path="/category/:id" component={CategoryDetail}/>
-    //   </BrowserRouter>
-    //   )
-    // }
-    return(
-      <BrowserRouter>
-      <Redirect to={{ pathname: '/category/' + this.state.id }} />
-      <Route path="/category/:id" component={CategoryDetail}/>
-    </BrowserRouter>
-    )
+    this.props.callback(true, id);
   }
   render() {
-    debugger
     const redirect = this.state.redirect;
-    return (      
-      <BrowserRouter>
-      {redirect ? this.renderRedirectDetail() : (
-        <tr onClick={this.choseCategory.bind(this, this.props.data.id)}>
+    return (     
+      <div> 
+        <tr>
           <td>{this.props.stt}</td>
           <td>
             <Link
-              to={{ pathname: '/category/' + this.props.data.id }}
-              className="list-group-item"
-              key={this.props.data.id}>
+              to={`/category/${this.props.data.id}`}
+              className="list-group-item">
               {this.props.data.title}
             </Link>
           </td>
         </tr>
-      )}
-      </BrowserRouter>
+          </div>
     )
   }
 }
 class CategoryDetail extends React.Component {
+
+
   render() {
+    const { match, location, history } = this.props;
+    console.log(match, location, history)
     let category = {};
-    let id = this.props.id;
+    let {id} = match.params;
     for (var i = 0; i < newsList.length; i++) {
       if (id == newsList[i].id) {
         category = newsList[i];
@@ -133,6 +115,9 @@ class CategoryDetail extends React.Component {
     )
   }
 }
+
+export const CategoryDetailRoute = withRouter(CategoryDetail);
+
 class CategoryCreate extends React.Component {
   render() {
     return (
@@ -147,8 +132,11 @@ class TableList extends React.Component {
     super();
     this.state = {
       currentPage: 1,
-      newsPerPage: 3
+      newsPerPage: 3,
+      isDetail: false,
+      idChoose:0
     };
+    this.callbackFunction = this.callbackFunction.bind(this);
   }
 
   chosePage = (event) => {
@@ -165,6 +153,14 @@ class TableList extends React.Component {
   viewCreateCategory() {
 
   }
+  callbackFunction(isDetail, id) {
+    this.setState((prevState, props) => {
+      return {
+        isDetail: isDetail,
+        idChoose: id
+      };
+    });
+  }
   render() {
     let currentPage = this.state.currentPage;
     let newsPerPage = this.state.newsPerPage;
@@ -178,11 +174,9 @@ class TableList extends React.Component {
     for (let i = 1; i <= Math.ceil(newsList.length / newsPerPage); i++) {
       pageNumbers.push(i);
     }
-
     return (
       <div>
         <div>
-
           <button onClick={this.viewCreateCategory.bind(this)} style={{ cursor: "pointer" }}>Tạo mới category</button>
         </div>
         <table className="table">
